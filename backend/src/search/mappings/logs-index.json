@@ -1,0 +1,48 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "number_of_replicas": 1,
+    "index": {
+      "refresh_interval": "1s"
+    }
+  },
+  "mappings": {
+    "dynamic": "strict",
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "applicationId": {
+        "type": "keyword"
+      },
+      "environment": {
+        "type": "keyword"
+      },
+      "severity": {
+        "type": "keyword"
+      },
+      "message": {
+        "type": "text",
+        "analyzer": "standard",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 512
+          }
+        }
+      },
+      "timestamp": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis"
+      },
+      "tags": {
+        "type": "keyword"
+      },
+      "rawPayload": {
+        "type": "object",
+        "dynamic": true,
+        "enabled": false
+      }
+    }
+  }
+}
