@@ -21,7 +21,9 @@ interface ThemeProviderProps {
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored === 'light' || stored === 'dark' ? stored : 'dark';
+    const resolved = stored === 'light' || stored === 'dark' ? stored : 'dark';
+    document.documentElement.setAttribute('data-theme', resolved);
+    return resolved;
   });
 
   const setTheme = (newTheme: Theme) => {
@@ -31,6 +33,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, theme);
+    document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
   const value = useMemo(() => ({ theme, setTheme }), [theme]);

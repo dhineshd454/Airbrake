@@ -9,7 +9,6 @@ export function LoginPage() {
   const [params] = useSearchParams();
 
   const handleLogin = () => {
-    // Dev bypass: set a fake session token and role, then redirect
     localStorage.setItem('session_token', `dev-token-${role}`);
     localStorage.setItem('session_role', role);
     const redirect = params.get('redirect_uri') ?? '/dashboard';
@@ -17,24 +16,77 @@ export function LoginPage() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 120, fontFamily: 'sans-serif' }}>
-      <h2>Airbrake Monitoring Portal</h2>
-      <p style={{ color: '#666' }}>Dev login — pick a role to continue</p>
-      <select
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-        style={{ padding: '8px 12px', fontSize: 14, marginBottom: 12, borderRadius: 4, border: '1px solid #ccc' }}
-      >
-        {ROLES.map((r) => (
-          <option key={r} value={r}>{r}</option>
-        ))}
-      </select>
-      <button
-        onClick={handleLogin}
-        style={{ padding: '8px 24px', fontSize: 14, borderRadius: 4, background: '#2563eb', color: '#fff', border: 'none', cursor: 'pointer' }}
-      >
-        Sign in
-      </button>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'var(--bg)',
+      fontFamily: 'var(--font)',
+    }}>
+      <div style={{
+        width: 360,
+        background: 'var(--surface)',
+        border: '1px solid var(--card-border)',
+        borderRadius: 'var(--radius-lg)' as unknown as number,
+        padding: '36px 32px',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+      }}>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <div style={{ fontSize: 36, marginBottom: 10 }}>🔥</div>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)', marginBottom: 6 }}>
+            Airbrake Portal
+          </h1>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Dev login — pick a role to continue</p>
+        </div>
+
+        {/* Role selector */}
+        <div style={{ marginBottom: 16 }}>
+          <label htmlFor="role-select" style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            Role
+          </label>
+          <select
+            id="role-select"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--input-border)',
+              borderRadius: 'var(--radius-sm)' as unknown as number,
+              color: 'var(--text)',
+              fontSize: 14,
+              outline: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            {ROLES.map((r) => (
+              <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Sign in button */}
+        <button
+          onClick={handleLogin}
+          style={{
+            width: '100%',
+            padding: '11px',
+            background: 'var(--accent)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 'var(--radius-sm)' as unknown as number,
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'background var(--transition)',
+          }}
+        >
+          Sign in
+        </button>
+      </div>
     </div>
   );
 }

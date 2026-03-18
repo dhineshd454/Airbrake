@@ -120,6 +120,20 @@ app.use((_req: unknown, res: { setHeader: (k: string, v: string) => void }, next
   next();
 });
 
+// ─── Swagger UI ──────────────────────────────────────────────────────────────
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const swaggerUi = require('swagger-ui-express');
+import { swaggerSpec } from './api/swagger';
+
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customSiteTitle: 'Airbrake Portal API Docs',
+  customCss: '.swagger-ui .topbar { background: #0d1526; } .swagger-ui .topbar-wrapper img { content: none; } .swagger-ui .topbar-wrapper::before { content: "🔥 Airbrake Portal"; color: #fff; font-size: 18px; font-weight: 700; }',
+}));
+
+// Expose raw spec for tooling
+app.get('/api/docs.json', (_req: unknown, res: any) => res.json(swaggerSpec));
+
 // Health check
 app.get('/api/health', (_req: unknown, res: any) => res.json({ status: 'ok' }));
 
@@ -190,6 +204,48 @@ app.get('/api/retention', (_req: unknown, res: any) => res.json({ applicationId:
 
 // Logs
 app.get('/api/logs', (_req: unknown, res: any) => res.json({ data: [], total: 0 }));
+
+// ─── Ingest API ───────────────────────────────────────────────────────────────
+
+import { createIngestRouter } from './api/ingestRouter';
+import { DefaultErrorAggregator } from './aggregator/errorAggregator';
+
+const breakGroupRepository = {
+  findByFingerprint: async (_fp: string) => null,
+  save: async (g: any) => g,
+  update: async (g: any) => g,
+};
+
+const breakSaveRepository = {
+  save: async (_b: any) => {},
+};
+
+const breakSearchIndexer = {
+  indexBreak: async (_b: any) => {},
+  indexBreakGroup: async (_g: any) => {},
+};
+
+const errorAggregator = new DefaultErrorAggregator(
+  breakGroupRepository,
+  breakSaveRepository,
+  breakSearchIndexer,
+);
+
+const ingestParseErrorWriter = {
+  write: async (_raw: unknown, msg: string) => {
+    console.error('[Ingest] parse error:', msg);
+  },
+};
+
+app.use(
+  '/api/ingest',
+  createIngestRouter(
+    logPipeline,
+    errorAggregator,
+    ingestParseErrorWriter,
+    process.env.INGEST_API_KEY,
+  ),
+);
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 
