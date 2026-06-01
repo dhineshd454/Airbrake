@@ -1,4 +1,4 @@
-name: Build and Deploy (FE to S3 & BE to ECS)
+name: Build and Deploy (FE to S3 and BE to ECS)
 
 on:
   push:
